@@ -2,7 +2,6 @@ package hw02unpackstring
 
 import (
 	"errors"
-	// "strconv"
 	"strings"
 	"unicode"
 )
@@ -10,7 +9,6 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func Unpack(input string) (string, error) {
-
 	if input == "" {
 		return "", nil
 	}
@@ -20,13 +18,6 @@ func Unpack(input string) (string, error) {
 	var sb strings.Builder
 	var prev rune
 	for pos, char := range str {
-		// если цифра
-		//// если перед этим цифра - строка невалидная
-		//// если первый символ - строка невалидная
-		//// иначе писать предыдущий символ эн раз
-		// если буква
-		//// если перед этим буква - писать предыдущий символ
-		//// если последняя - писать букву
 		if unicode.IsDigit(char) {
 			if pos == 0 || unicode.IsDigit(prev) {
 				return "", ErrInvalidString
