@@ -18,22 +18,38 @@ func Unpack(input string) (string, error) {
 	var sb strings.Builder
 	var prev rune
 	for pos, char := range str {
-		if unicode.IsDigit(char) {
-			if pos == 0 || unicode.IsDigit(prev) {
+		if IsDigit(char) {
+			if IsFirstRune(str, pos) || IsDigit(prev) {
 				return "", ErrInvalidString
 			}
-			for i := 1; i <= int(char-'0'); i++ {
-				sb.WriteRune(prev)
-			}
+			RepeatRune(&sb, prev, int(char-'0'))
 		} else {
-			if pos != 0 && !unicode.IsDigit(prev) {
+			if !IsFirstRune(str, pos) && !IsDigit(prev) {
 				sb.WriteRune(prev)
 			}
-			if pos == len(str)-1 {
+			if IsLastRune(str, pos) {
 				sb.WriteRune(char)
 			}
 		}
 		prev = char
 	}
 	return sb.String(), nil
+}
+
+func RepeatRune(sb *strings.Builder, r rune, num int) {
+	for i := 1; i <= num; i++ {
+		sb.WriteRune(r)
+	}
+}
+
+func IsFirstRune(str []rune, pos int) bool {
+	return pos == 0 && len(str) != 0
+}
+
+func IsLastRune(str []rune, pos int) bool {
+	return pos == len(str)-1 && len(str) != 0
+}
+
+func IsDigit(r rune) bool {
+	return unicode.IsDigit(r)
 }
