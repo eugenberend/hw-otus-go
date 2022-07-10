@@ -24,6 +24,7 @@ func TestList(t *testing.T) {
 		l.PushBack(30)  // [10, 20, 30]
 		require.Equal(t, 3, l.Len())
 
+		require.NotEqual(t, nil, l.Front().Next.Prev)
 		require.Equal(t, l.Front(), l.Front().Next.Prev)
 
 		middle := l.Front().Next // 20
