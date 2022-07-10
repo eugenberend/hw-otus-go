@@ -1,7 +1,6 @@
 package hw04lrucache
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -52,7 +51,6 @@ func TestList(t *testing.T) {
 			elems = append(elems, i.Value.(int))
 		}
 		require.Equal(t, []int{70, 80, 60, 40, 10, 30, 50}, elems)
-		fmt.Println(l.Front())
 	})
 	t.Run("remove all", func(t *testing.T) {
 		l := NewList()

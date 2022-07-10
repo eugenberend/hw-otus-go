@@ -17,8 +17,8 @@ type ListItem struct {
 }
 
 type list struct {
-	FirstItem *ListItem
-	LastItem  *ListItem
+	firstItem *ListItem
+	lastItem  *ListItem
 	length    int
 }
 
@@ -27,11 +27,11 @@ func NewList() List {
 }
 
 func (l *list) Front() *ListItem {
-	return l.FirstItem
+	return l.firstItem
 }
 
 func (l *list) Back() *ListItem {
-	return l.LastItem
+	return l.lastItem
 }
 
 func (l *list) Len() int {
@@ -45,9 +45,9 @@ func (l *list) PushFront(v interface{}) *ListItem {
 		Next:  currentFront,
 		Prev:  nil,
 	}
-	l.FirstItem = newFront
+	l.firstItem = newFront
 	if l.Len() == 0 {
-		l.LastItem = newFront
+		l.lastItem = newFront
 	} else {
 		currentFront.Prev = newFront
 	}
@@ -62,9 +62,9 @@ func (l *list) PushBack(v interface{}) *ListItem {
 		Next:  nil,
 		Prev:  currentBack,
 	}
-	l.LastItem = newBack
+	l.lastItem = newBack
 	if l.Len() == 0 {
-		l.FirstItem = newBack
+		l.firstItem = newBack
 	} else {
 		currentBack.Next = newBack
 	}
@@ -79,13 +79,13 @@ func (l *list) Remove(i *ListItem) {
 	if prev != nil {
 		prev.Next = next
 	} else {
-		l.FirstItem = next
+		l.firstItem = next
 	}
 
 	if next != nil {
 		next.Prev = prev
 	} else {
-		l.LastItem = prev
+		l.lastItem = prev
 	}
 
 	l.length--
