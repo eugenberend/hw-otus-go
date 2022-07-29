@@ -7,8 +7,8 @@ import (
 )
 
 var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
-var WorkersNumberNegative = errors.New("number of workers should be positive")
 
+var ErrWorkersNumberNegative = errors.New("number of workers should be positive")
 
 type Task func() error
 
@@ -22,7 +22,7 @@ func Run(tasks []Task, n, m int) error {
 	}
 
 	if n <= 0 {
-		return WorkersNumberNegative
+		return ErrWorkersNumberNegative
 	}
 
 	if len(tasks) < n {

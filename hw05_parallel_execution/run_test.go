@@ -78,7 +78,7 @@ func TestRun(t *testing.T) {
 		workersCount := -10
 		maxErrorsCount := 0
 		err := Run(tasks, workersCount, maxErrorsCount)
-		require.Truef(t, errors.Is(err, WorkersNumberNegative), "actual err - %v", err)
+		require.Truef(t, errors.Is(err, ErrWorkersNumberNegative), "actual err - %v", err)
 	})
 
 	t.Run("if tasks count is less than workers count, do not spawn extra workers", func(t *testing.T) {
