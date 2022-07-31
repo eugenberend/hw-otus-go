@@ -38,6 +38,89 @@ func TestRun(t *testing.T) {
 		require.LessOrEqual(t, runTasksCount, int32(workersCount+maxErrorsCount), "extra tasks were started")
 	})
 
+	t.Run("if M == 0, process only one task (if every task does return an error)", func(t *testing.T) {
+		tasksCount := 50
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+
+		for i := 0; i < tasksCount; i++ {
+			err := fmt.Errorf("error from task %d", i)
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+				atomic.AddInt32(&runTasksCount, 1)
+				return err
+			})
+		}
+
+		workersCount := 10
+		maxErrorsCount := 0
+		err := Run(tasks, workersCount, maxErrorsCount)
+
+		require.Truef(t, errors.Is(err, ErrErrorsLimitExceeded), "actual err - %v", err)
+		require.Equal(t, int(runTasksCount), 1, "only one task should be processed")
+	})
+
+	t.Run("if tasks count is 0, everything should work", func(t *testing.T) {
+		tasksCount := 0
+		tasks := make([]Task, 0, tasksCount)
+
+		workersCount := 10
+		maxErrorsCount := 0
+		Run(tasks, workersCount, maxErrorsCount)
+		// Test only should run without errors, worker spawning is under the hood
+	})
+
+	t.Run("if workers count is less than 0, exception should be thrown", func(t *testing.T) {
+		tasksCount := 0
+		tasks := make([]Task, 0, tasksCount)
+
+		workersCount := -10
+		maxErrorsCount := 0
+		err := Run(tasks, workersCount, maxErrorsCount)
+		require.Truef(t, errors.Is(err, ErrWorkersNumberNegative), "actual err - %v", err)
+	})
+
+	t.Run("if tasks count is less than workers count, do not spawn extra workers", func(t *testing.T) {
+		tasksCount := 5
+		tasks := make([]Task, 0, tasksCount)
+
+		for i := 0; i < tasksCount; i++ {
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+				return nil
+			})
+		}
+
+		workersCount := 10
+		maxErrorsCount := 0
+		Run(tasks, workersCount, maxErrorsCount)
+		// Test only should run without errors, worker spawning is under the hood
+	})
+
+	t.Run("if m <=0, than all tasks finished regardless of error", func(t *testing.T) {
+		tasksCount := 7
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+
+		for i := 0; i < tasksCount; i++ {
+			err := fmt.Errorf("error from task %d", i)
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+				atomic.AddInt32(&runTasksCount, 1)
+				return err
+			})
+		}
+
+		workersCount := 3
+		maxErrorsCount := -10
+		err := Run(tasks, workersCount, maxErrorsCount)
+
+		require.Truef(t, err == nil, "no maxErrorsCount should be returned")
+		require.LessOrEqual(t, int(runTasksCount), tasksCount, "all tasks should be completed")
+	})
+
 	t.Run("tasks without errors", func(t *testing.T) {
 		tasksCount := 50
 		tasks := make([]Task, 0, tasksCount)
